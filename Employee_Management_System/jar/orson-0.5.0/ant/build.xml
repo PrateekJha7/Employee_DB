@@ -1,0 +1,182 @@
+<!-- ORSON Build Script -->
+
+<project name="Orson" default="all" basedir="..">
+
+    <!-- Initialisation. -->
+    <target name="initialise" description="Initialise required settings.">
+        <tstamp />
+        <property name="orson.name" value="orson" />
+        <property name="orson.version" value="0.5.0" />
+        <property name="builddir" value="${basedir}/build" />
+        <property name="jcommon.version" value="1.0.10" />
+        <property name="jfreechart.version" value="1.0.6" />
+        <property name="junit.version" value="4.3.1" />
+        <property name="jcommon.jar" value="${basedir}/lib/jcommon-${jcommon.version}.jar"/>
+        <property name="jfreechart.jar" value="${basedir}/lib/jfreechart-${jfreechart.version}.jar"/>
+        <property name="junit.jar" value="${basedir}/lib/junit-${junit.version}.jar"/>
+        <path id="build.classpath">
+            <pathelement location="${jcommon.jar}"/>
+            <pathelement location="${jfreechart.jar}"/>
+        </path>
+    </target>
+
+    <!-- Compile the Bean classes -->
+    <target name="compile" depends="initialise"
+            description="Compile the Bean source code.">
+
+        <!-- create a temp build directory -->
+        <mkdir dir="${basedir}/build" />
+
+        <!-- compile the source -->
+        <javac srcdir="${basedir}/source" 
+               destdir="${basedir}/build"
+               debug="on"
+               deprecation="on">
+            <classpath refid="build.classpath" />
+            <include name="org/jfree/**"/>
+        </javac>
+
+    	<!-- copy across the ResourceBundle property files -->
+        <copy todir="${builddir}/org/jfree/beans/">
+          <fileset dir="source/org/jfree/beans">
+            <include name="*.properties"/>
+          </fileset>
+        </copy>
+
+    	<!-- copy across the icon files -->
+        <copy todir="${builddir}/org/jfree/beans/">
+          <fileset dir="${basedir}/images">
+            <include name="*.png"/>
+          </fileset>
+        </copy>
+
+    	
+        <!-- make the jar -->
+        <jar jarfile="${basedir}/${orson.name}-${orson.version}.jar"
+             basedir="${basedir}/build" >
+	      <manifest>
+                <section name="org/jfree/beans/JAreaChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+                <section name="org/jfree/beans/JBarChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+                <section name="org/jfree/beans/JLineChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+                <section name="org/jfree/beans/JPieChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+                <section name="org/jfree/beans/JScatterChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+                <section name="org/jfree/beans/JTimeSeriesChart.class">
+                  <attribute name="JavaBean" value="true"/>
+                </section>
+              </manifest>
+        </jar>
+
+        <!-- delete the temp directory -->
+        <delete dir="${basedir}/build" />
+
+    </target>
+
+    <!-- Generate the Orson API HTML pages -->
+    <target name="javadoc" depends="initialise">
+        <delete dir="${basedir}/javadoc" />
+        <mkdir dir="${basedir}/javadoc" />
+        <javadoc destdir="${basedir}/javadoc" 
+                 windowtitle="Orson Chart Beans (version ${orson.version})"
+                 overview="${basedir}/source/overview.html"
+                 use="yes"
+                 linksource="yes"
+                 splitindex="yes">
+            <classpath refid="build.classpath" />
+            <packageset dir="${basedir}/source" defaultexcludes="yes">
+                <include name="org/jfree/**"/>
+            </packageset>
+        </javadoc>
+    </target>	
+
+    <!-- Fill the 'distribution' directory. -->
+    <target name="fill-distribution" depends="compile,javadoc">
+	
+        <!-- delete the temporary distribution directory, if there is one -->
+        <delete dir="${basedir}/distribution" />
+
+    	<!-- make a temporary distribution directory -->
+        <mkdir dir="${basedir}/distribution" />
+
+        <!-- copy across README.txt and ChangeLog -->
+        <copy file="${basedir}/README.txt" tofile="${basedir}/distribution/README.txt" />
+        <copy file="${basedir}/ChangeLog" tofile="${basedir}/distribution/ChangeLog" />
+
+        <!-- copy across LICENCE -->
+        <copy file="${basedir}/licence-LGPL.txt" tofile="${basedir}/distribution/licence-LGPL.txt" />
+
+        <!-- copy across runtime jar file and demo jar file -->
+        <copy file="${basedir}/${orson.name}-${orson.version}.jar" tofile="${basedir}/distribution/${orson.name}-${orson.version}.jar" />
+    
+        <!-- copy across source files -->
+        <copy todir="${basedir}/distribution/source/org">
+            <fileset dir="${basedir}/source/org">
+              <exclude name="**/CVS/*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${basedir}/distribution/tests">
+            <fileset dir="${basedir}/tests">
+              <exclude name="**/CVS/*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${basedir}/distribution/javadoc">
+            <fileset dir="${basedir}/javadoc">
+            </fileset>
+        </copy>
+
+        <copy todir="${basedir}/distribution/docs">
+            <fileset dir="${basedir}/docs">
+            </fileset>
+        </copy>
+
+        <copy todir="${basedir}/distribution/images">
+            <fileset dir="${basedir}/images" />
+        </copy>
+    	
+        <!-- copy across lib files -->
+        <copy file="${jfreechart.jar}" tofile="${basedir}/distribution/lib/jfreechart-${jfreechart.version}.jar" />
+        <copy file="${jcommon.jar}" tofile="${basedir}/distribution/lib/jcommon-${jcommon.version}.jar" />
+        <copy file="${junit.jar}" tofile="${basedir}/distribution/lib/junit-${junit.version}.jar" />
+
+        <!-- copy across ant build files -->
+        <copy file="${basedir}/ant/build.xml" tofile="${basedir}/distribution/ant/build.xml" />
+
+        <!-- convert end-of-line characters in text files -->
+        <fixcrlf srcdir="${basedir}/distribution/source"
+                 eol="crlf" eof="remove"
+                 excludes="**/*.jpg" />
+
+    	<fixcrlf srcdir="${basedir}/distribution/tests"
+                 eol="lf" eof="remove"
+                 excludes="**/*.jpg" />
+
+    </target>
+
+    <!-- Make .zip distribution for Orson -->
+    <target name="zip" depends="fill-distribution">
+
+        <!-- make the zip file -->
+        <zip zipfile="${basedir}/${orson.name}-${orson.version}.zip">
+             <zipfileset dir="${basedir}/distribution"
+                         prefix="${orson.name}-${orson.version}" />
+        </zip>
+
+    </target>
+
+    <!-- ALL -->
+    <target name="all" depends="zip"
+	    description="Do it all.">
+    </target>
+
+</project>

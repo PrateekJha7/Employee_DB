@@ -1,0 +1,48 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0xa720475d, pid=21875, tid=0x85d38b40
+#
+# JRE version: OpenJDK Runtime Environment (8.0_181-b13) (build 1.8.0_181-8u181-b13-0ubuntu0.16.04.1-b13)
+# Java VM: OpenJDK Server VM (25.181-b13 mixed mode linux-x86 )
+# Problematic frame:
+# v  ~BufferBlob::jni_fast_GetLongField
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x86272000):  JavaThread "AWT-XAWT" daemon [_thread_in_native, id=21892, stack(0x85ce8000,0x85d39000)]
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x00000000
+
+Registers:
+EAX=0x00000000, EBX=0x8637d000, ECX=0x00000456, EDX=0x00000000
+ESP=0x85d37d98, EBP=0x85d37de8, ESI=0x00000042, EDI=0x8627212c
+EIP=0xa720475d, EFLAGS=0x00010246, CR2=0x00000000
+
+Top of Stack: (sp=0x85d37d98)
+0x85d37d98:   83be7538 8635d7f9 8627212c 00000000
+0x85d37da8:   00000042 b7607a09 8637f580 00000000
+0x85d37db8:   8627212c aba5a300 887d9068 85d37e24
+0x85d37dc8:   85d37de8 aba5a300 b70a7140 00010002
+0x85d37dd8:   8635d7cd 85ffd000 83be7538 00000000
+0x85d37de8:   83be6fa8 85f132db 83be6fa8 00000000
+0x85d37df8:   00000000 85eeb893 8623caa0 0000b975
+0x85d37e08:   85f13279 85ffd000 00600003 86003c18 
+
+Instructions: (pc=0xa720475d)
+0xa720473d:   00 00 00 56 8b 0d 94 4f 0c b7 f6 c1 01 0f 85 30
+0xa720474d:   00 00 00 8b c1 83 e0 01 8b 54 04 0c 8b 74 24 10
+0xa720475d:   8b 12 c1 ee 02 8b 04 32 8b 54 32 04 be 94 4f 0c
+0xa720476d:   b7 33 f2 33 f0 33 f2 33 f0 3b 0e 0f 85 02 00 00 
+
+Register to memory mapping:
+
+EAX=
